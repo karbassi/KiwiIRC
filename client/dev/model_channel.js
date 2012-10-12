@@ -29,5 +29,58 @@ kiwi.model.Channel = kiwi.model.Panel.extend({
                 this.addMsg(' ', '== ' + member.displayNick(true) + ' has left ' + msg, 'action part');
             }
         }, this);
+    },
+
+
+
+    /**
+     * Helper methods
+     */
+    say: function (msg) {
+        kiwi.app.controlbox.processInput('/msg ' + this.get('name') + ' ' + msg);
+    },
+
+    action: function (msg) {
+        kiwi.gateway.action(this.get('name'), msg);
+    },
+
+    users: function (nick, fn) {
+            var users = [],
+                members = this.get('members');
+
+            // if we don't have any users.. nothing to do
+            if (!members || members.models.length === 0) {
+                return users;
+            }
+
+            // If only a callback function has been set, set a blank name
+            if (typeof nick === 'function') {
+                fn = nick;
+                nick = null;
+            }
+
+            // Get 1 user only
+            if (typeof nick === 'string') {
+                users.push(members.getByNick(nick));
+
+            } else if (typeof nick === 'object' && nick) {
+                // Find each of the specified users
+                _.each(nick, function (nick) {
+                    var tmp = members.getByNick(nick);
+                    if (tmp) users.push(tmp);
+                });
+            } else {
+                // Otherwise.. just get them all
+                _.each(members.models, function (member) {
+                    if (member) users.push(member);
+                });
+            }
+
+            // If a callback function has been set, call it with each channel
+            if (typeof fn === 'function') {
+                _.each(users, fn);
+            }
+
+            return users;
     }
 });

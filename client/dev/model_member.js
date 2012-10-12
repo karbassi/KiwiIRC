@@ -93,5 +93,26 @@ kiwi.model.Member = Backbone.Model.extend({
         }
 
         return display;
+    },
+
+
+
+
+
+
+    /**
+     * Helper methods
+     */
+    say: function (msg) {
+        kiwi.app.controlbox.processInput('/msg ' + this.get('nick') + ' ' + msg);
+    },
+
+    action: function (msg) {
+        kiwi.gateway.action(this.get('nick'), msg);
+    },
+
+    hasMode: function (mode) {
+        var modes = this.get('modes');
+        return (_.indexOf(modes, mode) >= 0);
     }
 });
